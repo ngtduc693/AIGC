@@ -1,0 +1,55 @@
+log:
+  log_level: INFO
+
+service:
+  host: 0.0.0.0        # listen on all interfaces
+  port: 8282           # change if you expose another port on Vast.ai
+  cert_file: ssl_certs/localhost.crt  # HTTPS optional for local test
+  cert_key: ssl_certs/localhost.key
+
+chat_engine:
+  model_root: models   # central folder for all downloaded weights
+
+  handler_configs:
+
+    # -------- Client‑side 3D avatar (LAM Gaussian Splatting) --------
+    LamClient:
+      module: client/h5_rendering_client/client_handler_lam
+      # ⚠️  Runtime code will substitute `{user_id}` with the actual UID you generate
+      asset_path: "user_assets/{user_id}/lam_avatar.zip"   # generated from user photo
+      concurrent_limit: 5
+
+    # -------- Voice Activity Detection --------
+    SileroVad:
+      module: vad/silerovad/vad_handler/silero
+      speaking_threshold: 0.5
+      start_delay: 2048
+      end_delay: 2048
+      buffer_look_back: 1024
+      speech_padding: 512
+
+    # -------- Automatic Speech Recognition --------
+    ASR_SenseVoice:
+      module: asr/sensevoice/asr_handler_sensevoice
+      model_name: "iic/SenseVoiceSmall"
+
+    # -------- Local LLM (MiniCPM‑o int4) --------
+    S2S_MiniCPM:
+      module: llm/minicpm/llm_handler_minicpm
+      model_name: "MiniCPM-o-2_6-int4"   # fits on 8 GB VRAM
+      enable_video_input: false
+      voice_prompt: ""
+      assistant_prompt: ""
+
+    # -------- Voice Cloning TTS (CosyVoice local) --------
+    TTS_CosyVoice:
+      module: tts/cosyvoice/tts_handler_cosyvoice
+      model_name: "iic/CosyVoice-300M-SFT"
+      # Replaced per‑user after onboarding ↓
+      ref_audio_path: "user_assets/{user_id}/ref_voice.wav"
+      ref_audio_text: "Xin chào, tôi là KinVoice."
+      sample_rate: 24000
+
+    # -------- Avatar expression driver (audio2exp) --------
+    AvatarDriver:
+      module: avatar/lam/avatar_handler_lam_audio2expression
