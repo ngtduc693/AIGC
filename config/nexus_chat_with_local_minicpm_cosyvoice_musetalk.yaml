@@ -1,0 +1,47 @@
+default:
+  logger:
+    log_level: "INFO"
+  service:
+    host: "0.0.0.0"
+    port: 8282
+    cert_file: "ssl_certs/localhost.crt"
+    cert_key: "ssl_certs/localhost.key"
+  chat_engine:
+    model_root: "models"
+    handler_search_path:
+      - "src/handlers"
+    handler_configs:
+      RtcClient:
+        module: client/rtc_client/client_handler_rtc
+        concurrent_limit: 2  # Cho phép nhiều user đồng thời
+      SileroVad:
+        module: vad/silerovad/vad_handler_silero
+        speaking_threshold: 0.5
+        start_delay: 2048
+        end_delay: 5000
+        buffer_look_back: 5000
+        speech_padding: 512
+      SenseVoice:
+        enabled: True
+        module: asr/sensevoice/asr_handler_sensevoice
+        model_name: "iic/SenseVoiceSmall"
+      CosyVoice:
+        enabled: True
+        module: tts/cosyvoice/tts_handler_cosyvoice  # Dùng local
+        voice: "longxiaochun"
+        model_name: "cosyvoice-v1"
+        ref_audio_path: "resource/avatar/fake_users.wav"  # Đường dẫn file audio user upload
+      LLM_MiniCPM:
+        enabled: True
+        module: llm/minicpm/llm_handler_minicpm  # Dùng local MiniCPM
+        model_name: "MiniCPM-o-2_6-int4"
+        model_path: "models/MiniCPM-o-2_6-int4"  # Đường dẫn tới model đã tải
+        system_prompt: "请你扮演一个 AI 助手，用简短的两三句对话来回答用户的问题，并在对话内容中加入合适的标点符号，不需要讨论标点符号相关的内容"
+      AvatarMusetalk:
+        module: avatar/musetalk/avatar_handler_musetalk
+        fps: 20
+        batch_size: 2
+        avatar_video_path: "resource/avatar/fake_user.jpeg"  # Đường dẫn file ảnh/video user upload
+        avatar_model_dir: "models/musetalk/avatar_model"
+        force_create_avatar: false
+        debug: false
