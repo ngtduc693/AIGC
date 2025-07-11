@@ -29,7 +29,7 @@ default:
         enabled: True
         module: tts/cosyvoice/tts_handler_cosyvoice  # Dùng local
         voice: "longxiaochun"
-        model_name: "iic/cosyvoice-v1"
+        model_name: "iic/CosyVoice2-0.5B"
         ref_audio_path: "resource/avatar/fake_user.wav"  # Đường dẫn file audio user upload
       LLM_MiniCPM:
         enabled: True
